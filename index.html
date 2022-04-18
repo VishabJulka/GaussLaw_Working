@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript" src="3DCube.js"></script>
+
+<head>
+  <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script type = "text/javascript" src = "https://www.gstatic.com/charts/loader.js"></script>
+    <script type = "text/javascript">
+         google.charts.load('current', {packages: ['corechart','line']});  
+    </script>
+     
+</head>
+<body>
+  <div class="container">
+    <h3>Gauss Law</h3>
+    Use the up-down-right-left arrow keys and the "a" and "z" keys to rotate the shape in 3D alongth x,y,z axis.</br></br>
+    <div style="display: flex;">
+      <canvas id="myCanvas" width="650" height="400"
+      style="border:1px solid #d3d3d3;">
+      </canvas>
+    
+      <div id = "container" style = "width: 550px; height: 400px; margin: 0 auto">
+      </div>
+    </div>
+    
+    <!-- <button onclick="change();" id="redoo">Increase Sphere Radius</button> -->
+    <!-- <button id="charge">Charge</button> -->
+    <h3>Charge</h3>
+    <h4 id="chargevalue">1.0</h4>
+    
+    <input type="range" max="70" value="1" min="1" id="charge1">
+    <input type="range"  step="5" max="450" min="75" value="75" id="sphereRadius">
+
+
+    <div style="display: flex;">
+      <div>
+        <table class="table table-striped">
+          <thead class="thead-dark ">
+              <tr>
+                  <th>X</th>
+                  <th>Y  </th>
+              </tr>
+        </thead>
+        <tbody>
+          <tr>
+              <td style="width: 25%;"><input type="text" id="x1" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+              <td style="width: 25%;"><input type="text" id="y1" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+          </tr>
+          <tr>
+              <td style="width: 25%;"><input type="text" id="x2" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+              <td style="width: 25%;"><input type="text" id="y2" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+          </tr>
+          <tr>
+              <td style="width: 25%;"><input type="text" id="x3" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+              <td style="width: 25%;"><input type="text" id="y3" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+          </tr>
+          <tr>
+              <td style="width: 25%;"><input type="text" id="x4" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+              <td style="width: 25%;"><input type="text" id="y4" placeholder="value" style="box-sizing: border-box;margin: 0px;width: 50%;"></td>
+          </tr>
+        </tbody>
+        </table>
+        <button onclick="fun1()">Equation</button>
+      </div>
+      <div style="padding: 0px 50px;">
+        <h2 id="equation"></h2>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+  
+<script>
+  var x1 = document.getElementById("x1");
+  var x2 = document.getElementById("x2");
+  var x3 = document.getElementById("x3");
+  var x4 = document.getElementById("x4");
+  var y1 = document.getElementById("y1");
+  var y2 = document.getElementById("y2");
+  var y3 = document.getElementById("y3");
+  var y4 = document.getElementById("y4");
+  var x11,y11;
+  var known_x,known_y;
+
+  var print = document.getElementById("equation");
+    function linearRegression(y,x){
+    var lr = {};
+    var n = y.length;
+    var sum_x = 0;
+    var sum_y = 0;
+    var sum_xy = 0;
+    var sum_xx = 0;
+    var sum_yy = 0;
+
+    for (var i = 0; i < y.length; i++) {
+
+        sum_x += x[i];
+        sum_y += y[i];
+        sum_xy += (x[i]*y[i]);
+        sum_xx += (x[i]*x[i]);
+        sum_yy += (y[i]*y[i]);
+    } 
+
+    lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
+    lr['intercept'] = (sum_y - lr.slope * sum_x)/n;
+    lr['r2'] = Math.pow((n*sum_xy - sum_x*sum_y)/Math.sqrt((n*sum_xx-sum_x*sum_x)*(n*sum_yy-sum_y*sum_y)),2);
+
+    return lr;
+}
+
+  function fun1()
+  {
+
+  x11=x1.value;
+  y11=y1.value;
+
+  x12=x2.value;
+  y12=y2.value;
+
+  x13=x3.value;
+  y13=y3.value;
+
+  x14=x4.value;
+  y14=y4.value;
+
+
+  x1 = parseFloat(x11);
+  y1 = parseFloat(y11);
+
+  x2 = parseFloat(x12);
+  y2 = parseFloat(y12);
+
+  x3 = parseFloat(x13);
+  y3 = parseFloat(y13);
+
+  x4 = parseFloat(x14);
+  y4 = parseFloat(y14);
+
+
+  console.log(typeof(y1));
+  known_y = [y1,y2,y3,y4];
+  known_x = [x1,x2,x3,x4];
+  console.log(known_x);
+  console.log(known_y);
+  var lr = linearRegression(known_y, known_x);
+  console.log(lr);
+
+  console.log(lr.intercept);
+  console.log(lr.slope);
+
+  print.innerHTML = "y = " + lr.slope + "x" + "+" + lr.intercept;
+  }
+
+  
+
+</script>
+
+<script>
+  var range = document.getElementById("redoo1");
+  var sphere = new Sphere3D();
+  var rotation = new Point3D();
+  
+  var lastX = -1;
+  var lastY = -1;
+  
+  
+  function Point3D() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
+  
+  function Sphere3D(radius) {
+    this.vertices = new Array();
+    this.radius = (typeof(radius) == "undefined" || typeof(radius) != "number") ? 20.0 : radius;
+    this.rings = 16;
+    this.slices = 32;
+    this.numberOfVertices = 0;
+  
+    var M_PI_2 = Math.PI / 2;
+    var dTheta = (Math.PI * 2) / this.slices;
+    var dPhi = Math.PI / this.rings;
+  
+    // Iterate over latitudes (rings)
+    for (var lat = 0; lat < this.rings + 1; ++lat) {
+      var phi = M_PI_2 - lat * dPhi;
+      var cosPhi = Math.cos(phi);
+      var sinPhi = Math.sin(phi);
+  
+      // Iterate over longitudes (slices)
+      for (var lon = 0; lon < this.slices + 1; ++lon) {
+        var theta = lon * dTheta;
+        var cosTheta = Math.cos(theta);
+        var sinTheta = Math.sin(theta);
+        p = this.vertices[this.numberOfVertices] = new Point3D();
+  
+        p.x = this.radius * cosTheta * cosPhi;
+        p.y = this.radius * sinPhi;
+        p.z = this.radius * sinTheta * cosPhi;
+        this.numberOfVertices++;
+      }
+    }
+    window.requestAnimationFrame(Sphere3D);
+  }
+  
+  function rotateX(point, radians) {
+    var y = point.y;
+    point.y = (y * Math.cos(radians)) + (point.z * Math.sin(radians) * -1.0);
+    point.z = (y * Math.sin(radians)) + (point.z * Math.cos(radians));
+  }
+  
+  function rotateY(point, radians) {
+    var x = point.x;
+    point.x = (x * Math.cos(radians)) + (point.z * Math.sin(radians) * -1.0);
+    point.z = (x * Math.sin(radians)) + (point.z * Math.cos(radians));
+  }
+  
+  function rotateZ(point, radians) {
+    var x = point.x;
+    point.x = (x * Math.cos(radians)) + (point.y * Math.sin(radians) * -1.0);
+    point.y = (x * Math.sin(radians)) + (point.y * Math.cos(radians));
+  }
+  
+  function projection(xy, z, xyOffset, zOffset, distance) {
+    return ((distance * xy) / (z - zOffset)) + xyOffset;
+  }
+  
+  function strokeSegment(index, ctx, width, height) {
+    var x, y;
+    var p = sphere.vertices[index];
+  
+    rotateX(p, rotation.x);
+    rotateY(p, rotation.y);
+    rotateZ(p, rotation.z);
+  
+    x = projection(p.x, p.z, width / 2.0, 100.0, distance);
+    y = projection(p.y, p.z, height / 2.0, 100.0, distance);
+  
+    if (lastX == -1 && lastY == -1) {
+      lastX = x;
+      lastY = y;
+      return;
+    }
+  
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+      if (p.z < 0) {
+        ctx.strokeStyle = "green";
+      } else {
+        ctx.strokeStyle = "black";
+      }
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.closePath();
+      lastX = x;
+      lastY = y;
+    }
+  }
+  
+  function render() {
+    var canvas = document.getElementById("myCanvas");
+    var width = canvas.getAttribute("width");
+    var height = canvas.getAttribute("height");
+    var ctx = canvas.getContext('2d');
+    var centerx = width/2;
+    var centery = height/2;
+  
+    ctx.lineWidth = 1;
+    var p = new Point3D();
+    // ctx.fillStyle = "black";
+  
+    // ctx.clearRect(0, 0, width, height);
+    // ctx.fillRect(0, 0, width, height);
+  
+    // draw each vertex to get the first sphere skeleton
+    for (i = 0; i < sphere.numberOfVertices; i++) {
+      // strokeSegment(i, ctx, width, height);
+    }
+  
+    // now walk through rings to draw the slices
+    for (i = 0; i < sphere.slices + 1; i++) {
+      for (var j = 0; j < sphere.rings + 1; j++) {
+        strokeSegment(i + (j * (sphere.slices + 1)), ctx, width, height);
+      }
+    }
+
+  
+  //   rotation.x += Math.PI/180.0;
+  //   rotation.y += Math.PI/90.0;
+  //   rotation.z += Math.PI/90.0;
+  
+    // set distance to 0 and enable this to get a zoom in animation
+  //   if(distance < 1000) {
+  //   	distance += 10;
+  //     } 
+  ctx.lineWidth = 1;
+  }
+  
+  // function drawCircle()
+  // {
+  //   var canvas = document.getElementById("myCanvas");
+  //   var ctx = canvas.getContext('2d');
+
+  //   ctx.lineWidth = 1;
+
+  //   ctx.beginPath();
+  //   ctx.arc(650/2,400/2,distance,0,2*Math.PI);
+  //   ctx.strokeStyle = 'green';
+  //   ctx.stroke();
+  // }
+ 
+</script>
+
+<script language = "JavaScript">
+  var displayvalue = 0;
+  var v1,v2,counter=0,v3,changeEF=0,v4=0;
+  function drawChart() {
+     // Define the chart to be drawn.
+     var data = new google.visualization.DataTable();
+     
+     data.addColumn('number', 'Radius');
+     data.addColumn('number', 'Electric Field');
+    
+     if(displayvalue)
+     {
+        v1=0.100;
+        v2=0.900;
+        data.addRows([[ v1  , v2]]); //0
+        v1= v1+0.001;
+        v2 = v2-0.012;
+        if(counter >= 75)
+        {
+          data.addRows([[ v1  , v2]]);  //1
+          if(changeEF == 75)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/70;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+        
+        if(counter >= 80)
+        {
+          data.addRows([[ v1  , v2]]); //2
+          if(changeEF == 80)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/69;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+       
+        if(counter >= 85)
+        {
+          data.addRows([[ v1  , v2]]); //3
+          if(changeEF == 85)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 =  v3/68;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+       
+        if(counter >= 90)
+        {
+          data.addRows([[ v1  , v2]]); //4
+          if(changeEF == 90)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/67;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+ 
+        if(counter >= 95)
+        {
+          data.addRows([[ v1  , v2]]);  //5
+          if(changeEF == 95)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/66;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+        
+        if(counter >= 100) 
+        {
+          data.addRows([[ v1  , v2]]);  //6 
+          if(changeEF == 100)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/65;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+        
+        if(counter >= 105)
+        {
+          data.addRows([[ v1  , v2]]);  //7 
+          if(changeEF == 105)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/64;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+        
+        if(counter>=110)
+        {
+          data.addRows([[ v1  , v2]]);  //8
+          if(changeEF == 110)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/63;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=115)
+        {
+          data.addRows([[ v1  , v2]]);  //9
+          if(changeEF == 115)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/62;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=120)
+        {
+          data.addRows([[ v1  , v2]]);  //10
+          if(changeEF == 120)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/61;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=125)
+        {
+          data.addRows([[ v1  , v2]]);  //11
+          if(changeEF == 125)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/60;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=130)
+        {
+          data.addRows([[ v1  , v2]]);  //12
+          if(changeEF == 130)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/59;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=135)
+        {
+          data.addRows([[ v1  , v2]]);  //13
+          if(changeEF == 135)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/58;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=140)
+        {
+          data.addRows([[ v1  , v2]]);  //14
+          if(changeEF == 140)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/57;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=145)
+        {
+          data.addRows([[ v1  , v2]]);  //15
+          if(changeEF == 145)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/56;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=150)
+        {
+          data.addRows([[ v1  , v2]]);  //16
+          if(changeEF == 150)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/55;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=155)
+        {
+          data.addRows([[ v1  , v2]]);  //17
+          if(changeEF == 155)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/54;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=160)
+        {
+          data.addRows([[ v1  , v2]]);  //18
+          if(changeEF == 160)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/53;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=165)
+        {
+          data.addRows([[ v1  , v2]]);  //19
+          if(changeEF == 165)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/52;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=170)
+        {
+          data.addRows([[ v1  , v2]]);  //20
+          if(changeEF == 170)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/51;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=175)
+        {
+          data.addRows([[ v1  , v2]]);  //21
+          if(changeEF == 175)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/50;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=180)
+        {
+          data.addRows([[ v1  , v2]]);  //22
+          if(changeEF == 180)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/49;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=185)
+        {
+          data.addRows([[ v1  , v2]]);  //23
+          if(changeEF == 185)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/48;
+          }
+          v1= v1+0.001;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=190)
+        {
+          data.addRows([[ v1  , v2]]);  //24
+          if(changeEF == 190)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/47;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=195)
+        {
+          data.addRows([[ v1  , v2]]);  //25
+          if(changeEF == 195)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/46;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=200)
+        {
+          data.addRows([[ v1  , v2]]);  //26
+          if(changeEF == 200)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/45;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=205)
+        {
+          data.addRows([[ v1  , v2]]);  //27
+          if(changeEF == 205)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/44;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=210)
+        {
+          data.addRows([[ v1  , v2]]);  //28
+          if(changeEF == 210)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/43;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=215)
+        {
+          data.addRows([[ v1  , v2]]);  //29
+          if(changeEF == 215)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/42;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=220)
+        {
+          data.addRows([[ v1  , v2]]);  //30
+          if(changeEF == 220)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/41;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=225)
+        {
+          data.addRows([[ v1  , v2]]);  //31
+          if(changeEF == 225)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/40;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=230)
+        {
+          data.addRows([[ v1  , v2]]);  //32
+          if(changeEF == 230)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/39;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=235)
+        {
+          data.addRows([[ v1  , v2]]);  //33
+          if(changeEF == 235)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/38;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=240)
+        {
+          data.addRows([[ v1  , v2]]);  //34
+          if(changeEF == 240)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/37;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=245)
+        {
+          data.addRows([[ v1  , v2]]);  //35
+          if(changeEF == 245)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/36;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=250)
+        {
+          data.addRows([[ v1  , v2]]);  //36
+          if(changeEF == 250)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/35;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=255)
+        {
+          data.addRows([[ v1  , v2]]);  //37
+          if(changeEF == 255)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/34;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=260)
+        {
+          data.addRows([[ v1  , v2]]);  //38
+          if(changeEF == 260)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/33;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=265)
+        {
+          data.addRows([[ v1  , v2]]);  //39
+          if(changeEF == 265)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/32;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=270)
+        {
+          data.addRows([[ v1  , v2]]);  //40
+          if(changeEF == 270)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/31;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=275)
+        {
+          data.addRows([[ v1  , v2]]);  //41
+          if(changeEF == 275)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/30;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=280)
+        {
+          data.addRows([[ v1  , v2]]);  //42
+          if(changeEF == 280)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/29;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=285)
+        {
+          data.addRows([[ v1  , v2]]);  //43
+          if(changeEF == 285)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/28;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=290)
+        {
+          data.addRows([[ v1  , v2]]);  //44
+          if(changeEF == 290)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/27;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=295)
+        {
+          data.addRows([[ v1  , v2]]);  //45
+          if(changeEF == 295)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/26;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=300)
+        {
+          data.addRows([[ v1  , v2]]);  //46
+          if(changeEF == 300)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/25;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=305)
+        {
+          data.addRows([[ v1  , v2]]);  //47
+          if(changeEF == 305)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/24;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=310)
+        {
+          data.addRows([[ v1  , v2]]);  //48
+          if(changeEF == 310)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/23;
+          }
+          v1= v1+0.002;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=315)
+        {
+          data.addRows([[ v1  , v2]]);  //49
+          if(changeEF == 315)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/22;
+          }
+          v1= v1+0.003;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=320)
+        {
+          data.addRows([[ v1  , v2]]);  //50
+          if(changeEF == 320)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/21;
+          }
+          v1= v1+0.003;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=325)
+        {
+          data.addRows([[ v1  , v2]]);  //51
+          if(changeEF == 325)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/20;
+          }
+          v1= v1+0.003;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=330)
+        {
+          data.addRows([[ v1  , v2]]);  //52
+          if(changeEF == 330)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/19;
+          }
+          v1= v1+0.003;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=335)
+        {
+          data.addRows([[ v1  , v2]]);  //53
+          if(changeEF == 335)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/18;
+          }
+          v1= v1+0.003;
+          v2 = v2-0.012-v4;
+        }
+        
+        if(counter>=340)
+        {
+          data.addRows([[ v1  , v2]]);  //54
+          if(changeEF == 340)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/17;
+          }
+          v1= v1+0.005;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=345)
+        {
+          data.addRows([[ v1  , v2]]);  //55
+          if(changeEF == 345)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/16;
+          }
+          v1= v1+0.005;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=350)
+        {
+          data.addRows([[ v1  , v2]]);  //56
+          if(changeEF == 350)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/15;
+          }
+          v1= v1+0.005;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=355)
+        {
+          data.addRows([[ v1  , v2]]);  //57
+          if(changeEF == 355)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/14;
+          }
+          v1= v1+0.005;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=360)
+        {
+          data.addRows([[ v1  , v2]]);  //58
+          if(changeEF == 360)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/13;
+          }
+          v1= v1+0.005;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=365)
+        {
+          data.addRows([[ v1  , v2]]);  //59
+          if(changeEF == 365)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/12;
+          }
+          v1= v1+0.005;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=370)
+        {
+          data.addRows([[ v1  , v2]]);  //60
+          if(changeEF == 370)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/11;
+          }
+          v1= v1+0.008;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=375)
+        {
+          data.addRows([[ v1  , v2]]);  //61
+          if(changeEF == 375)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/10;
+          }
+          v1= v1+0.008;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=380)
+        {
+          data.addRows([[ v1  , v2]]);  //62
+          if(changeEF == 380)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/9;
+          }
+          v1= v1+0.008;
+          v2 = v2-0.012-v4;
+        }
+  
+        if(counter>=385)
+        {
+          data.addRows([[ v1  , v2]]);  //63
+          if(changeEF == 385)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/8;
+          }
+          v1= v1+0.015;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=390)
+        {
+          data.addRows([[ v1  , v2]]);  //64
+          if(changeEF == 390)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/7;
+          }
+          v1= v1+0.015;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=395)
+        {
+          data.addRows([[ v1  , v2]]);  //65
+          if(changeEF == 395)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/6;
+          }
+          v1= v1+0.015;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=400)
+        {
+          data.addRows([[ v1  , v2]]);  //66
+          if(changeEF == 400)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/5;
+          }
+          v1= v1+0.015;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=405)
+        {
+          data.addRows([[ v1  , v2]]);  //67
+          if(changeEF == 405)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/4;
+          }
+          v1= v1+0.022;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=410)
+        {
+          data.addRows([[ v1  , v2]]);  //68
+          if(changeEF == 410)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/3;
+          }
+          v1= v1+0.022;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=415)
+        {
+          data.addRows([[ v1  , v2]]);  //69
+          if(changeEF == 415)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/2;
+          }
+          v1= v1+0.045;
+          v2 = v2-0.012-v4;
+        }
+
+        if(counter>=420)
+        {
+          data.addRows([[ v1  , v2]]);
+          if(changeEF == 420)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/1;
+          }
+          v1= v1+0.060;
+          v2 = v2-0.012-v4; //71
+        }
+        
+
+        if(counter>=425)
+        {
+          data.addRows([[ v1  , v2]]);
+          if(changeEF == 425)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/1;
+          }
+          v1= v1+0.110;
+          v2 = v2-0.012-v4; //72
+        }
+        
+
+        if(counter>=430)
+        {
+          data.addRows([[ v1  , v2]]);
+          if(changeEF == 430)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/1;
+          }
+          v1= v1+0.240;
+          v2 = v2-0.012-v4; //73
+        }
+        
+
+        if(counter>=435)
+        {
+          data.addRows([[ v1  , v2]]);
+          if(changeEF == 435)
+          {
+            v2 = v2 + v3;
+            data.addRows([[ v1  , v2]]);
+            v4 = v3/1;
+          }
+          v1= v1+0.198;
+          v2 = v2-0.014-v4; // 74
+          
+        }
+        
+
+        if(counter>=440)
+        {
+          data.addRows([[ v1 , v2]]);
+        }
+
+        
+        
+
+     }
+     
+     // Set chart options
+     var options = {'title' : 'Electric Field VS Radius',
+        hAxis: {
+           title: 'Radius'
+        },
+        vAxis: {
+           title: 'E Field'
+        },   
+        'width':550,
+        'height':400,
+        curveType: 'function'
+     };
+
+     // Instantiate and draw the chart.
+     var chart = new google.visualization.LineChart(document.getElementById('container'));
+     chart.draw(data, options);
+  }
+  google.charts.setOnLoadCallback(drawChart);
+
+</script>
+
+
+</body>
+</html>
